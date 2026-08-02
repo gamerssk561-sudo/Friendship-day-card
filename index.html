@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friendship Day Card</title>
+  <style>
+    :root {
+      --bg1: #ffd6ea;
+      --bg2: #d7f3ff;
+      --bg3: #fff4c9;
+      --card: rgba(255,255,255,0.88);
+      --pink: #ff5fa2;
+      --pink-dark: #e0448d;
+      --text: #333;
+      --border: #ff9ac1;
+      --shadow: 0 12px 35px rgba(0,0,0,0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      color: var(--text);
+    }
+
+    .editor {
+      display: flex;
+      width: 300vw;
+      min-height: 100vh;
+      transition: transform 0.6s ease;
+    }
+
+    .page {
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .card {
+      width: min(900px, 92vw);
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2 {
+      color: #d63384;
+      margin: 0 0 14px;
+    }
+
+    p {
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      max-width: 560px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    button {
+      background: var(--pink);
+      color: #fff;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--pink-dark);
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .nav button {
+      width: auto;
+      min-width: 140px;
+    }
+
+    .share-box {
+      background: #fff;
+      border: 2px solid #ffd1e5;
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .slot {
+      border: 2px dashed #ff8bb7;
+      border-radius: 18px;
+      min-height: 170px;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      color: #888;
+      padding: 8px;
+    }
+
+    .slot span {
+      position: absolute;
+      z-index: 0;
+      font-size: 14px;
+      padding: 10px;
+    }
+
+    .slot input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tiny {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .final-wrap {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .final-photos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .final-photos .photo {
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 150px;
+      background: #f7f7f7;
+    }
+
+    .final-photos img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .link-box {
+      width: 100%;
+      max-width: 560px;
+      min-height: 90px;
+      resize: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="editor" id="editorPages">
+    <section class="page">
+      <div class="card">
+        <h1>Happy Friendship Day to my friend</h1>
+        <p>Fill the name, add memories, and write your greeting. Then press Finish to create the shareable final card.</p>
+
+        <input id="friendName" type="text" placeholder="Enter your friend's name" />
+
+        <div class="share-box">
+          <p><strong>Preview:</strong></p>
+          <p id="previewText">Happy Friendship Day to my friend!</p>
+        </div>
+
+        <div class="nav">
+          <button type="button" onclick="goTo(1)">Next Page</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="card">
+        <h2>Add Photos</h2>
+        <p>Upload any photos you want. These will appear in the final shared card.</p>
+
+        <div class="photo-grid">
+          <label class="slot">
+            <span>Click to add photo 1</span>
+            <input accept="image/*" type="file" onchange="loadImage(event, 0)">
+            <img id="img0" alt="Photo 1">
+          </label>
+
+          <label class="slot">
+            <span>Click to add photo 2</span>
+            <input accept="image/*" type="file" onchange="loadImage(event, 1)">
+            <img id="img1" alt="Photo 2">
+          </label>
+
+          <label class="slot">
+            <span>Click to add photo 3</span>
+            <input accept="image/*" type="file" onchange="loadImage(event, 2)">
+            <img id="img2" alt="Photo 3">
+          </label>
+        </div>
+
+        <div class="nav">
+          <button type="button" onclick="goTo(0)">Back</button>
+          <button type="button" onclick="goTo(2)">Next Page</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="card">
+        <h2>Write Your Greeting</h2>
+        <p>Make it big, warm, and personal.</p>
+
+        <textarea id="greetingNote" placeholder="Write your special friendship message here..."></textarea>
+
+        <div class="share-box">
+          <h2 id="finalGreeting">Happy Friendship Day!</h2>
+          <p id="finalNote">Your message will appear here.</p>
+        </div>
+
+        <div class="nav">
+          <button type="button" onclick="goTo(1)">Back</button>
+          <button type="button" onclick="previewFinal()">Preview Greeting</button>
+          <button type="button" onclick="finishShare()">Finish & Share</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="page final-wrap" id="finalPage">
+    <div class="card">
+      <h1 id="publicGreeting">Happy Friendship Day!</h1>
+      <p id="publicNote"></p>
+      <div class="final-photos" id="publicPhotos"></div>
+      <p class="tiny" style="margin-top:16px;">This is the final shared card.</p>
+
+      <div class="share-box">
+        <p><strong>Your share link:</strong></p>
+        <textarea id="shareLink" class="link-box" readonly></textarea>
+      </div>
+
+      <div class="nav">
+        <button type="button" onclick="copyShareLink()">Copy Link</button>
+        <button type="button" onclick="createNew()">Create New Card</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const editorPages = document.getElementById('editorPages');
+    const finalPage = document.getElementById('finalPage');
+    const friendName = document.getElementById('friendName');
+    const previewText = document.getElementById('previewText');
+    const greetingNote = document.getElementById('greetingNote');
+    const finalGreeting = document.getElementById('finalGreeting');
+    const finalNote = document.getElementById('finalNote');
+    const publicGreeting = document.getElementById('publicGreeting');
+    const publicNote = document.getElementById('publicNote');
+    const publicPhotos = document.getElementById('publicPhotos');
+    const shareLink = document.getElementById('shareLink');
+    const photos = [null, null, null];
+    const photoEls = [document.getElementById('img0'), document.getElementById('img1'), document.getElementById('img2')];
+
+    function goTo(index) {
+      editorPages.style.transform = `translateX(-${index * 100}vw)`;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function encodeText(value) {
+      return encodeURIComponent(value || '');
+    }
+
+    function decodeText(value) {
+      return decodeURIComponent(value || '');
+    }
+
+    friendName.addEventListener('input', () => {
+      const name = friendName.value.trim();
+      previewText.textContent = name
+        ? `Happy Friendship Day to my friend, ${name}!`
+        : 'Happy Friendship Day to my friend!';
+    });
+
+    function loadImage(event, index) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const dataUrl = String(e.target.result || '');
+        photos[index] = dataUrl;
+        const img = photoEls[index];
+        img.src = dataUrl;
+        img.style.display = 'block';
+        const label = img.previousElementSibling;
+        if (label) label.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewFinal() {
+      const name = friendName.value.trim();
+      const note = greetingNote.value.trim();
+
+      finalGreeting.textContent = name ? `Happy Friendship Day, ${name}!` : 'Happy Friendship Day!';
+      finalNote.textContent = note || 'Your message will appear here.';
+    }
+
+    function buildShareUrl(data) {
+      const url = new URL(location.href);
+      url.search = '';
+      url.searchParams.set('name', data.name || '');
+      url.searchParams.set('note', data.note || '');
+      data.photos.forEach((photo, i) => {
+        if (photo) url.searchParams.set(`photo${i + 1}`, photo);
+      });
+      return url.toString();
+    }
+
+    function renderFinal(data) {
+      document.body.style.overflow = 'auto';
+      editorPages.style.display = 'none';
+      finalPage.style.display = 'flex';
+
+      publicGreeting.textContent = data.name
+        ? `Happy Friendship Day, ${data.name}!`
+        : 'Happy Friendship Day!';
+
+      publicNote.textContent = data.note || '';
+
+      publicPhotos.innerHTML = '';
+      data.photos.forEach(src => {
+        if (!src) return;
+        const box = document.createElement('div');
+        box.className = 'photo';
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = 'Friendship photo';
+        box.appendChild(img);
+        publicPhotos.appendChild(box);
+      });
+
+      const finalData = {
+        name: data.name || '',
+        note: data.note || '',
+        photos: data.photos || ['', '', '']
+      };
+
+      const link = buildShareUrl(finalData);
+      shareLink.value = link;
+    }
+
+    function finishShare() {
+      previewFinal();
+      const data = {
+        name: friendName.value.trim(),
+        note: greetingNote.value.trim(),
+        photos: [...photos]
+      };
+      renderFinal(data);
+    }
+
+    async function copyShareLink() {
+      try {
+        await navigator.clipboard.writeText(shareLink.value);
+        alert('Share link copied.');
+      } catch (e) {
+        shareLink.focus();
+        shareLink.select();
+        document.execCommand('copy');
+        alert('Share link copied.');
+      }
+    }
+
+    function createNew() {
+      location.href = location.pathname;
+    }
+
+    (function init() {
+      const params = new URLSearchParams(location.search);
+      const name = decodeText(params.get('name') || '');
+      const note = decodeText(params.get('note') || '');
+      const p1 = decodeText(params.get('photo1') || '');
+      const p2 = decodeText(params.get('photo2') || '');
+      const p3 = decodeText(params.get('photo3') || '');
+
+      if (name || note || p1 || p2 || p3) {
+        renderFinal({
+          name,
+          note,
+          photos: [p1, p2, p3]
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
